@@ -157,12 +157,12 @@
                 {
                 title: "1. “就” (Jiù) ravishi",
                 description: {
-                    uz: "“就 + fe'l” yuqorida aytilgan fikrlar orqali xulosa va qaror chiqarishni anglatadi.",
+                    uz: "“就 + fe'l” yuqorida aytilgan fikrlar orqali xulosa va qaror chiqarishni anglatadi. Gapning mazmuniga qarab o'zbek tiliga '-bilanoq', 'unaqada (unday bo'lsa)' yoki 'shuning' kabi ma'nolarda ham tarjima qilinishi mumkin.",
                     en: "The structure “就 + Verb” connects to the previous context to draw a conclusion or make a resolution based on the mentioned situation.",
                     ru: "Конструкция “就 + глагол” связывает предложение с предыдущим контекстом для вывода заключения или принятия решения на основе упомянутой ситуации."
                 },
                 examples: [
-                    { zh: "你不想去，就在家休息吧。", uz: "Siz bormoqchi bo'lmasangiz, uyda dam oling." },
+                    { zh: "你不想去，就在家休息吧。", uz: "Siz bormoqchi bo'lmasangiz, uyda dam oling (unday bo'lsa/unaqada uyda dam oling)." },
                     { zh: "这儿的咖啡不错，就喝咖啡吧。", uz: "Bu yerning kofesi yaxshi, shuning uchun kofe icha qolaylik." },
                     { zh: "就做你爱吃的鱼吧。", uz: "Siz yoqtirgan baliqni pishiraylik." }
                 ]
@@ -212,25 +212,24 @@
                 { id: 15, type: 'grammar', question: "Bo'sh joyni to'ldiring: 这件不错，____ 买这件吧。", options: ['还', '就', '再', '也'], correct: 1 },
             ];
 
+            // Shared Audio Function
+            const playAudio = (text, e) => {
+                if (e) e.stopPropagation(); // 阻止事件冒泡
+                
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // 取消之前的发音，避免重叠
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'zh-CN';
+                    utterance.rate = 0.9; // 稍微放慢语速，适合初学者
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert("Browser does not support text-to-speech");
+                }
+            };
+
             // Components
             const Flashcard = ({ card }) => {
                 const [isFlipped, setIsFlipped] = useState(false);
-
-                const playAudio = (text, e) => {
-                    e.stopPropagation(); // 阻止事件冒泡，防止触发翻转
-                    
-                    if ('speechSynthesis' in window) {
-                        // 取消之前的发音，避免重叠
-                        window.speechSynthesis.cancel();
-                        
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.lang = 'zh-CN';
-                        utterance.rate = 0.9; // 稍微放慢语速
-                        window.speechSynthesis.speak(utterance);
-                    } else {
-                        alert("Browser does not support text-to-speech");
-                    }
-                };
 
                 return (
                 <div 
@@ -459,7 +458,20 @@
                                     ? 'bg-blue-600 text-white rounded-tr-none' 
                                     : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'
                                 }`}>
-                                    <div className="text-xs opacity-70 mb-1 font-bold tracking-wider">{line.role}</div>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div className="text-xs opacity-70 font-bold tracking-wider">{line.role}</div>
+                                        <button 
+                                            onClick={(e) => playAudio(line.hanzi, e)}
+                                            className={`p-1.5 rounded-full transition-colors -mt-1 -mr-1 ${
+                                                line.role === 'B' 
+                                                ? 'text-white/70 hover:text-white hover:bg-white/20' 
+                                                : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                            title="Tinglash (Listen)"
+                                        >
+                                            <Icons.Volume2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                     <div className="text-lg md:text-xl font-bold mb-1">{line.hanzi}</div>
                                     <div className={`text-sm mb-3 font-medium ${line.role === 'B' ? 'text-blue-100' : 'text-gray-500'}`}>{line.pinyin}</div>
                                     <div className={`text-sm pt-2 border-t leading-relaxed ${line.role === 'B' ? 'border-blue-500/50 text-blue-50' : 'border-gray-100 text-gray-600'}`}>
